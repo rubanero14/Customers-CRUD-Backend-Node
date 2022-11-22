@@ -19,16 +19,19 @@ app.use(
        origin: '*',
    })
 )
+const getAllCustomers = (cb) => {
+    fs.readFile(customerJSON, 'utf8', cb);
+};
 
 // GET: endpoint for get request
 app.get('/customers', async (req, res, next) => {
-   fs.readFile(customerJSON, 'utf8', (err, customers) => {
-       try {
+   getAllCustomers((err, customers) => {
+        try {
             res.send(JSON.parse(customers));
-       } catch {
+        } catch {
             console.log(err);
-       } 
-   });
+        } 
+    })
 })
 
 // PUT: endpoint for put request
@@ -43,7 +46,7 @@ app.post('/customers', async (req, res, next) => {
         age: age
     };
 
-    fs.readFile(customerJSON, 'utf8', (err, customers) => {
+    getAllCustomers((err, customers) => {
         try {
             customers = JSON.parse(customers);
             customers[customers.length] = customer;
@@ -51,18 +54,17 @@ app.post('/customers', async (req, res, next) => {
             console.log("customers", customers)
             fs.writeFile(customerJSON, customers, (err) => {
                 console.log(err);
-            })
+            });
+            res.redirect("/customers");
         } catch {
             console.log(err);
         }
     });
-   // Your code here
-   res.redirect("/customers");
 })
 
 app.get('/customers/:id', async (req, res, next) => {
     const id = req.params.id;
-    fs.readFile(customerJSON, 'utf8', async (err, customers) => {
+    getAllCustomers((err, customers) => {
         try {
             const customerData = JSON.parse(customers);
             const filteredCustomer = customerData.find(customer => customer.id === id);
@@ -76,20 +78,17 @@ app.get('/customers/:id', async (req, res, next) => {
 // DELETE: endpoint for delete request
 app.post('/deleteUser', async (req, res, next) => {
    const id = req.body.id;
-   console.log(id);
-   fs.readFile(customerJSON, 'utf8', (err, customers) => {
+   getAllCustomers((err, customers) => {
         try {
             const customerData = JSON.parse(customers);
             customers = customerData.filter(customer => customer.id !== id);
-            console.log(customers);
             fs.writeFile(customerJSON, JSON.stringify(customers), (err) => {
                 console.log(err);
-            })
-            console.log("Successfully deleted")
+            });
+            res.redirect('/customers')
         } catch {
             console.log(err);
         }
-        res.redirect('/customers')
     });
 })
 
@@ -113,7 +112,7 @@ app.get('/', async (req, res, next) => {
         </form>
         <h1>Delete Customer</h1>
         <form action="/deleteUser" method="POST">
-            <input type="hidden" name="id" value="cid1669142297813" />
+            <input type="hidden" name="id" value="cid1669145029641" />
             <button type="submit">Delete User</button>
         </form>
     `);
