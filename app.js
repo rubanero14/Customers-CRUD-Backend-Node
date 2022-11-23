@@ -50,7 +50,7 @@ app.post('/customers', async (req, res, next) => {
             fs.writeFile(customerJSON, customers, (err) => {
                 console.log(err);
             });
-            res.status(200).send("Registration successful");
+            res.status(200).redirect('/customers');
         } catch {
             res.status(503).send("Registration unsuccessful");
         }
@@ -87,10 +87,9 @@ app.post('/customers/edit/:id', async (req, res, next) => {
                 if(err) {
                     res.status(503).send(err);
                 } else {
-                    res.status(200).send(`Update for ID:${customer.id} successful!`);
+                    res.status(200).redirect('/customers');;
                 }
             });
-
         } catch {
             console.log("error fired")
             res.status(503).send(err);
@@ -110,7 +109,7 @@ app.post('/deleteUser', async (req, res, next) => {
                 if(err) {
                     res.status(503).send(err);
                 } else {
-                    res.status(200).send(`Delete for ID:${id} successful!`);
+                    res.status(200).redirect('/customers');;
                 }
             });
         } catch {
