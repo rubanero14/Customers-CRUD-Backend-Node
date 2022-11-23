@@ -14,11 +14,8 @@ app.use(Express.urlencoded());
 app.use(Express.json());
 
 // Activate Cors
-app.use(
-   Cors({
-       origin: '*',
-   })
-)
+app.options('*', Cors())
+
 const getAllCustomers = (cb) => {
     fs.readFile(customerJSON, 'utf8', cb);
 };
@@ -70,13 +67,14 @@ app.get('/customers/:id', async (req, res, next) => {
 // POST: endpoint for update customer details based on id
 app.post('/customers/edit/:id', async (req, res, next) => {
     const customer = req.body;
-
+    console.log(customer);
     getAllCustomers((err, customers) => {
         try {
             customers = JSON.parse(customers);
-            const targetCustomer = customers.map(customer => customer.id).indexOf(id);
-            console.log(targetCustomer)
-            customers[4] = customer;
+            const filteredCustomer = customers.find(c => c.id === customer.id);
+            const indexOfEditCustomer = customers.indexOf(filteredCustomer);
+            console.log('customer id: ', customers[indexOfEditCustomer])
+            customers[indexOfEditCustomer] = customer;
             customers = JSON.stringify(customers);
             fs.writeFile(customerJSON, customers, (err) => {
                 if(err) {
@@ -87,6 +85,7 @@ app.post('/customers/edit/:id', async (req, res, next) => {
             });
 
         } catch {
+            console.log("error fired")
             res.status(503).send(err);
         }
     });
@@ -94,7 +93,8 @@ app.post('/customers/edit/:id', async (req, res, next) => {
 
 // POST: endpoint for delete request
 app.post('/deleteUser', async (req, res, next) => {
-   const id = req.body.id;
+   const id = Object.keys(req.body)[0];
+   console.log(id)
    getAllCustomers((err, customers) => {
         try {
             const customerData = JSON.parse(customers);
@@ -109,46 +109,6 @@ app.post('/deleteUser', async (req, res, next) => {
         } catch {
             res.status(503).send(err);
         }
-    });
-})
-
-// Testing playground before building frontend 
-// GET: endpoint for home
-app.get('/', async (req, res, next) => {
-    // Your code here
-    res.send(`
-        <h1>Delete Customer</h1>
-        <form action="/deleteUser" method="POST">
-            <input type="hidden" name="id" value="cid1669145029641" />
-            <button type="submit">Delete User</button>
-        </form>
-    `);
-})
-
-app.get('/update/:id', async (req, res, next) => {
-    const id = req.params.id;
-    getAllCustomers((err, customers) => {
-        try {
-            const customerData = JSON.parse(customers);
-            const filteredCustomer = customerData.find(customer => customer.id === id);
-            res.send(`
-                <h1>Edit Customer</h1>
-                <form action="/customers/edit/${filteredCustomer.id}" method="POST">
-                    <label for="age">Customer First Name</label>
-                    <input type="text" value="${filteredCustomer.firstName}" placeholder="Enter customer First Name.." name="firstName" id="firstName" />
-                    <br/><br/>
-                    <label for="age">Customer Last Name</label>
-                    <input type="text" value="${filteredCustomer.lasName}" placeholder="Enter customer Last Name.." name="lastName" id="lastName" />
-                    <br/><br/>
-                    <label for="age">Customer Age</label>
-                    <input type="number" value="${filteredCustomer.age}" placeholder="Enter customer Age.." name="age" id="age" />
-                    <br/><br/>
-                    <input type="submit"/>
-                </form>
-            `)
-        } catch {
-            console.log(err);
-        } 
     });
 })
 
