@@ -3,11 +3,15 @@ const Express = require('express');
 const fs = require('fs');
 const Cors = require('cors');
 const path = require('path');
-
-const root = require('./util/path');
+require("dotenv").config();
 
 // Customer Data Storage File path
-const customerJSON = path.join(root, 'customers.json');
+let customerJSON = "";
+if (process.env.NODE_ENV !== "production") {
+    customerJSON = path.join(__dirname, `customers.json`);
+} else {
+    customerJSON = './tmp/customers.json';
+}
 
 // Initiate Express
 const app = Express();
