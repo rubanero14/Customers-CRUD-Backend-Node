@@ -23,7 +23,7 @@ const getAllCustomers = (cb) => {
     fs.readFile(customerJSON, 'utf8', cb);
 };
 
-// GET: endpoint for get request
+// GET: endpoint for get all customers list request
 app.get('/customers', async (req, res, next) => {
    getAllCustomers((err, customers) => {
         try {
@@ -34,7 +34,7 @@ app.get('/customers', async (req, res, next) => {
     })
 })
 
-// PUT: endpoint for put request
+// POST: endpoint for create new customer request
 app.post('/customers', async (req, res, next) => {
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
@@ -62,6 +62,7 @@ app.post('/customers', async (req, res, next) => {
     });
 })
 
+// GET: endpoint for customer details based on id request
 app.get('/customers/:id', async (req, res, next) => {
     const id = req.params.id;
     getAllCustomers((err, customers) => {
@@ -73,9 +74,39 @@ app.get('/customers/:id', async (req, res, next) => {
             console.log(err);
         } 
     });
- })
+})
 
-// DELETE: endpoint for delete request
+// POST: endpoint for update customer details based on id
+app.post('/customers/edit/:id', async (req, res, next) => {
+    const id = req.params.id;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const age = req.body.age;
+    const customer = {
+        id: id, 
+        firstName: firstName, 
+        lastName: lastName, 
+        age: age
+    };
+
+    getAllCustomers((err, customers) => {
+        try {
+            customers = JSON.parse(customers);
+            const targetCustomer = customers.map(customer => customer.id).indexOf(id);
+            console.log(targetCustomer)
+            customers[4] = customer;
+            customers = JSON.stringify(customers);
+            fs.writeFile(customerJSON, customers, (err) => {
+                console.log(err);
+            });
+            res.redirect("/customers");
+        } catch {
+            console.log(err);
+        }
+    });
+})
+
+// POST: endpoint for delete request
 app.post('/deleteUser', async (req, res, next) => {
    const id = req.body.id;
    getAllCustomers((err, customers) => {
@@ -116,6 +147,33 @@ app.get('/', async (req, res, next) => {
             <button type="submit">Delete User</button>
         </form>
     `);
+})
+
+app.get('/update/:id', async (req, res, next) => {
+    const id = req.params.id;
+    getAllCustomers((err, customers) => {
+        try {
+            const customerData = JSON.parse(customers);
+            const filteredCustomer = customerData.find(customer => customer.id === id);
+            res.send(`
+                <h1>Edit Customer</h1>
+                <form action="/customers/edit/${filteredCustomer.id}" method="POST">
+                    <label for="age">Customer First Name</label>
+                    <input type="text" value="${filteredCustomer.firstName}" placeholder="Enter customer First Name.." name="firstName" id="firstName" />
+                    <br/><br/>
+                    <label for="age">Customer Last Name</label>
+                    <input type="text" value="${filteredCustomer.lasName}" placeholder="Enter customer Last Name.." name="lastName" id="lastName" />
+                    <br/><br/>
+                    <label for="age">Customer Age</label>
+                    <input type="number" value="${filteredCustomer.age}" placeholder="Enter customer Age.." name="age" id="age" />
+                    <br/><br/>
+                    <input type="submit"/>
+                </form>
+            `)
+        } catch {
+            console.log(err);
+        } 
+    });
 })
 
 // Initiate Server
