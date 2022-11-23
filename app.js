@@ -80,18 +80,16 @@ app.post('/customers/edit/:id', async (req, res, next) => {
             customers = JSON.parse(customers);
             const filteredCustomer = customers.find(c => c.id === customer.id);
             const indexOfEditCustomer = customers.indexOf(filteredCustomer);
-            console.log('customer id: ', customers[indexOfEditCustomer])
             customers[indexOfEditCustomer] = customer;
             customers = JSON.stringify(customers);
             fs.writeFile(customerJSON, customers, (err) => {
                 if(err) {
                     res.status(503).send(err);
                 } else {
-                    res.status(200).redirect('/customers');;
+                    res.redirect('/customers').status(200);
                 }
             });
         } catch {
-            console.log("error fired")
             res.status(503).send(err);
         }
     });
@@ -109,7 +107,7 @@ app.post('/deleteUser', async (req, res, next) => {
                 if(err) {
                     res.status(503).send(err);
                 } else {
-                    res.status(200).redirect('/customers');;
+                    res.redirect('/customers').status(200);
                 }
             });
         } catch {
