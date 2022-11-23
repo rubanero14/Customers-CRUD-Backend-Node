@@ -21,7 +21,7 @@ app.use(Express.urlencoded());
 app.use(Express.json());
 
 // Activate Cors
-app.options('*', Cors())
+app.use(Cors({ origin: ["http://localhost:3000", "https://rubanero14.github.io"] }));
 
 const getAllCustomers = (cb) => {
     fs.readFile(customerJSON, 'utf8', cb);
