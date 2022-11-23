@@ -27,37 +27,28 @@ const getAllCustomers = (cb) => {
 app.get('/customers', async (req, res, next) => {
    getAllCustomers((err, customers) => {
         try {
-            res.send(JSON.parse(customers));
+            res.status(200).send(JSON.parse(customers));
         } catch {
-            console.log(err);
+            res.status(503).send(err);
         } 
     })
 })
 
 // POST: endpoint for create new customer request
 app.post('/customers', async (req, res, next) => {
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
-    const age = req.body.age;
-    const customer = {
-        id: `cid${Date.now()}`, 
-        firstName: firstName, 
-        lastName: lastName, 
-        age: age
-    };
+    const customer = req.body;
 
     getAllCustomers((err, customers) => {
         try {
             customers = JSON.parse(customers);
             customers[customers.length] = customer;
             customers = JSON.stringify(customers);
-            console.log("customers", customers)
             fs.writeFile(customerJSON, customers, (err) => {
                 console.log(err);
             });
-            res.redirect("/customers");
+            res.status(200).send("Registration successful");
         } catch {
-            console.log(err);
+            res.status(503).send("Registration unsuccessful");
         }
     });
 })
@@ -69,25 +60,16 @@ app.get('/customers/:id', async (req, res, next) => {
         try {
             const customerData = JSON.parse(customers);
             const filteredCustomer = customerData.find(customer => customer.id === id);
-            res.send(filteredCustomer);
+            res.status(200).send(filteredCustomer);
         } catch {
-            console.log(err);
+            res.status(503).send(err);
         } 
     });
 })
 
 // POST: endpoint for update customer details based on id
 app.post('/customers/edit/:id', async (req, res, next) => {
-    const id = req.params.id;
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
-    const age = req.body.age;
-    const customer = {
-        id: id, 
-        firstName: firstName, 
-        lastName: lastName, 
-        age: age
-    };
+    const customer = req.body;
 
     getAllCustomers((err, customers) => {
         try {
@@ -97,11 +79,15 @@ app.post('/customers/edit/:id', async (req, res, next) => {
             customers[4] = customer;
             customers = JSON.stringify(customers);
             fs.writeFile(customerJSON, customers, (err) => {
-                console.log(err);
+                if(err) {
+                    res.status(503).send(err);
+                } else {
+                    res.status(200).send(`Update for ID:${customer.id} successful!`);
+                }
             });
-            res.redirect("/customers");
+
         } catch {
-            console.log(err);
+            res.status(503).send(err);
         }
     });
 })
@@ -114,33 +100,23 @@ app.post('/deleteUser', async (req, res, next) => {
             const customerData = JSON.parse(customers);
             customers = customerData.filter(customer => customer.id !== id);
             fs.writeFile(customerJSON, JSON.stringify(customers), (err) => {
-                console.log(err);
+                if(err) {
+                    res.status(503).send(err);
+                } else {
+                    res.status(200).send(`Delete for ID:${id} successful!`);
+                }
             });
-            res.redirect('/customers')
         } catch {
-            console.log(err);
+            res.status(503).send(err);
         }
     });
 })
 
-
+// Testing playground before building frontend 
 // GET: endpoint for home
 app.get('/', async (req, res, next) => {
     // Your code here
     res.send(`
-        <h1>Add New Customer</h1>
-        <form action="/customers" method="POST">
-            <label for="age">Customer First Name</label>
-            <input type="text" placeholder="Enter customer First Name.." name="firstName" id="firstName" />
-            <br/><br/>
-            <label for="age">Customer Last Name</label>
-            <input type="text" placeholder="Enter customer Last Name.." name="lastName" id="lastName" />
-            <br/><br/>
-            <label for="age">Customer Age</label>
-            <input type="number" placeholder="Enter customer Age.." name="age" id="age" />
-            <br/><br/>
-            <input type="submit"/>
-        </form>
         <h1>Delete Customer</h1>
         <form action="/deleteUser" method="POST">
             <input type="hidden" name="id" value="cid1669145029641" />
