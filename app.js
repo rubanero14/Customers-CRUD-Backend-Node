@@ -10,7 +10,7 @@ let customerJSON = "";
 if (process.env.NODE_ENV !== "production") {
     customerJSON = path.join(__dirname, `customers.json`);
 } else {
-    customerJSON = './tmp/customers.json';
+    customerJSON = './var/task/customers.json';
 }
 
 // Initiate Express
