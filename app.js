@@ -2,9 +2,12 @@ const PORT = process.env.PORT || 3000;
 const Express = require('express');
 const fs = require('fs');
 const Cors = require('cors');
+const path = require('path');
+
+const root = require('./util/path');
 
 // Customer Data Storage File path
-const customerJSON = './customers.json';
+const customerJSON = path.join(root, 'customers.json');
 
 // Initiate Express
 const app = Express();
