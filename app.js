@@ -6,12 +6,7 @@ const path = require('path');
 require("dotenv").config();
 
 // Customer Data Storage File path
-let customerJSON = "";
-if (process.env.NODE_ENV !== "production") {
-    customerJSON = path.join(__dirname, `customers.json`);
-} else {
-    customerJSON = './tmp/customers.json';
-}
+const customerJSON = "./customers.json";
 
 // Initiate Express
 const app = Express();
