@@ -81,7 +81,7 @@ app.post('/customers/edit/:id', async (req, res, next) => {
                 if(err) {
                     res.status(503).send(err);
                 } else {
-                    res.redirect('/customers').status(200);
+                    res.redirect('/customers');
                 }
             });
         } catch {
@@ -102,7 +102,7 @@ app.post('/deleteUser', async (req, res, next) => {
                 if(err) {
                     res.status(503).send(err);
                 } else {
-                    res.redirect('/customers').status(200);
+                    res.redirect('/customers');
                 }
             });
         } catch {
