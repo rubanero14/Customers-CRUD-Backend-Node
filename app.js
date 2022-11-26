@@ -22,11 +22,6 @@ const getAllCustomers = (cb) => {
     fs.readFile(customerJSON, 'utf8', cb);
 };
 
-// // HOME: Root Endpoint
-// app.get('/', async (req, res, next) => {
-//     res.send("Customers-CRUD-Backend-Node");
-// })
-
 // CREATE: endpoint for create new customer request
 app.post('/customers', async (req, res, next) => {
     const customer = req.body;
@@ -116,11 +111,26 @@ app.post('/deleteUser', async (req, res, next) => {
     });
 })
 
-// Catch other undefined middlewares under Not Found category
-app.use((req, res, send) => {
+// HOME: Root Endpoint
+app.get('/', async (req, res, next) => {
+    res.send(`
+        <h1>Customers-CRUD-Backend-Node Web API Documentation<h1>
+        <h3>List of Endpoints</h3>
+        <ul>
+            <li><kbd>CREATE</kbd> => <code>'/customers'</code> [method: <em>POST</em>]</li>
+            <li><kbd>READ ALL</kbd> => <code>'/customers'</code> [method: <em>GET</em>]</li>
+            <li><kbd>READ</kbd> => <code>'/customers/:id'</code> [method: <em>GET</em>]</li>
+            <li><kbd>UPDATE</kbd> => <code>'/customers/edit/:id'</code> [method: <em>POST</em>]</li>
+            <li><kbd>DELETE</kbd> => <code>'/deleteUser'</code> [method: <em>POST</em>]</li>
+        </ul>
+    `);
+})
+
+// Catch All middleware for other undefined middlewares under Not Found category
+app.use((err, req, res, send) => {
     // respond page not found 
     res.status(404).send("404: Page not found");
- })
+})
 
 // Initiate Server
 app.listen(PORT, () => { console.log(`Server is online on PORT: http://localhost:${PORT}`)})
