@@ -1,8 +1,8 @@
 const PORT = process.env.PORT || 3000;
-const Express = require('express');
-const fs = require('fs');
-const Cors = require('cors');
-const path = require('path');
+const Express = require("express");
+const fs = require("fs");
+const Cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 
 // Customer Data Storage File path
@@ -16,104 +16,108 @@ app.use(Express.urlencoded());
 app.use(Express.json());
 
 // Activate Cors
-app.use(Cors({ origin: ["http://localhost:3000", "https://rubanero14.github.io"] }));
+app.use(
+  Cors({ origin: ["http://localhost:3000", "https://rubanero14.github.io"] })
+);
 
 const getAllCustomers = (cb) => {
-    fs.readFile(customerJSON, 'utf8', cb);
+  fs.readFile(customerJSON, "utf8", cb);
 };
 
 // CREATE: endpoint for create new customer request
-app.post('/customers', async (req, res, next) => {
-    const customer = req.body;
+app.post("/customers", async (req, res, next) => {
+  const customer = req.body;
 
-    getAllCustomers((err, customers) => {
-        try {
-            customers = JSON.parse(customers);
-            customers[customers.length] = customer;
-            customers = JSON.stringify(customers);
-            fs.writeFile(customerJSON, customers, (err) => {
-                console.log(err);
-            });
-            res.status(200).redirect('/customers');
-        } catch {
-            res.status(503).send("Registration unsuccessful");
-        }
-    });
-})
+  getAllCustomers((err, customers) => {
+    try {
+      customers = JSON.parse(customers);
+      customers[customers.length] = customer;
+      customers = JSON.stringify(customers);
+      fs.writeFile(customerJSON, customers, (err) => {
+        console.log(err);
+      });
+      res.status(200).redirect("/customers");
+    } catch {
+      res.status(503).send("Registration unsuccessful");
+    }
+  });
+});
 
 // READ: endpoint for get all customers list request
-app.get('/customers', async (req, res, next) => {
-    getAllCustomers((err, customers) => {
-         try {
-             res.status(200).send(JSON.parse(customers));
-         } catch {
-             res.status(503).send(err);
-         } 
-     })
- })
+app.get("/customers", async (req, res, next) => {
+  getAllCustomers((err, customers) => {
+    try {
+      res.status(200).send(JSON.parse(customers));
+    } catch {
+      res.status(503).send(err);
+    }
+  });
+});
 
 // READ: endpoint for customer details based on id request
-app.get('/customers/:id', async (req, res, next) => {
-    const id = req.params.id;
-    getAllCustomers((err, customers) => {
-        try {
-            const customerData = JSON.parse(customers);
-            const filteredCustomer = customerData.find(customer => customer.id === id);
-            res.status(200).send(filteredCustomer);
-        } catch {
-            res.status(503).send(err);
-        } 
-    });
-})
+app.get("/customers/:id", async (req, res, next) => {
+  const id = req.params.id;
+  getAllCustomers((err, customers) => {
+    try {
+      const customerData = JSON.parse(customers);
+      const filteredCustomer = customerData.find(
+        (customer) => customer.id === id
+      );
+      res.status(200).send(filteredCustomer);
+    } catch {
+      res.status(503).send(err);
+    }
+  });
+});
 
 // UPDATE: endpoint for update customer details based on id
-app.post('/customers/edit/:id', async (req, res, next) => {
-    const customer = req.body;
-    console.log(customer);
-    getAllCustomers((err, customers) => {
-        try {
-            customers = JSON.parse(customers);
-            const filteredCustomer = customers.find(c => c.id === customer.id);
-            const indexOfEditCustomer = customers.indexOf(filteredCustomer);
-            customers[indexOfEditCustomer] = customer;
-            customers = JSON.stringify(customers);
-            fs.writeFile(customerJSON, customers, (err) => {
-                if(err) {
-                    res.status(503).send(err);
-                } else {
-                    res.status(200).redirect('/customers');
-                }
-            });
-        } catch {
-            res.status(503).send(err);
+app.post("/customers/edit/:id", async (req, res, next) => {
+  const customer = req.body;
+  console.log(customer);
+  getAllCustomers((err, customers) => {
+    try {
+      customers = JSON.parse(customers);
+      const filteredCustomer = customers.find((c) => c.id === customer.id);
+      const indexOfEditCustomer = customers.indexOf(filteredCustomer);
+      customers[indexOfEditCustomer] = customer;
+      customers = JSON.stringify(customers);
+      fs.writeFile(customerJSON, customers, (err) => {
+        if (err) {
+          res.status(503).send(err);
+        } else {
+          res.status(200).redirect("/customers");
         }
-    });
-})
+      });
+    } catch {
+      res.status(503).send(err);
+    }
+  });
+});
 
 // DELETE: endpoint for delete request
-app.post('/deleteUser', async (req, res, next) => {
-   const id = Object.keys(req.body)[0];
-   console.log(id)
-   getAllCustomers((err, customers) => {
-        try {
-            const customerData = JSON.parse(customers);
-            customers = customerData.filter(customer => customer.id !== id);
-            fs.writeFile(customerJSON, JSON.stringify(customers), (err) => {
-                if(err) {
-                    res.status(503).send(err);
-                } else {
-                    res.status(200).redirect('/customers');
-                }
-            });
-        } catch {
-            res.status(503).send(err);
+app.post("/deleteUser", async (req, res, next) => {
+  const id = Object.keys(req.body)[0];
+  console.log(id);
+  getAllCustomers((err, customers) => {
+    try {
+      const customerData = JSON.parse(customers);
+      customers = customerData.filter((customer) => customer.id !== id);
+      fs.writeFile(customerJSON, JSON.stringify(customers), (err) => {
+        if (err) {
+          res.status(503).send(err);
+        } else {
+          res.status(200).redirect("/customers");
         }
-    });
-})
+      });
+    } catch {
+      res.status(503).send(err);
+    }
+  });
+});
 
 // HOME: Root Endpoint
-app.get('/', async (req, res, next) => {
-    res.send(`
+app.get("/", async (req, res, next) => {
+  res.send(`
         <h1>Customers-CRUD-Backend-Node Web API Documentation<h1>
         <h3>List of Endpoints</h3>
         <ul>
@@ -124,13 +128,15 @@ app.get('/', async (req, res, next) => {
             <li><kbd>DELETE</kbd> => <code>'/deleteUser'</code> [method: <em>POST</em>]</li>
         </ul>
     `);
-})
+});
 
 // Catch All middleware for other undefined middlewares under Not Found category
 app.use((err, req, res, send) => {
-    // respond page not found 
-    res.status(404).send("404: Page not found");
-})
+  // respond page not found
+  res.status(404).send("404: Page not found");
+});
 
 // Initiate Server
-app.listen(PORT, () => { console.log(`Server is online on PORT: http://localhost:${PORT}`)})
+app.listen(PORT, () => {
+  console.log(`Server is online on PORT: http://localhost:${PORT}`);
+});
