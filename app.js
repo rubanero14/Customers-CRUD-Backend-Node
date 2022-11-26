@@ -38,7 +38,7 @@ app.post("/customers", async (req, res, next) => {
       });
       res.status(200).redirect("/customers");
     } catch {
-      res.status(503).send("Registration unsuccessful");
+      res.status(503).send(err);
     }
   });
 });
@@ -73,7 +73,6 @@ app.get("/customers/:id", async (req, res, next) => {
 // UPDATE: endpoint for update customer details based on id
 app.post("/customers/edit/:id", async (req, res, next) => {
   const customer = req.body;
-  console.log(customer);
   getAllCustomers((err, customers) => {
     try {
       customers = JSON.parse(customers);
@@ -97,7 +96,6 @@ app.post("/customers/edit/:id", async (req, res, next) => {
 // DELETE: endpoint for delete request
 app.post("/deleteUser", async (req, res, next) => {
   const id = Object.keys(req.body)[0];
-  console.log(id);
   getAllCustomers((err, customers) => {
     try {
       const customerData = JSON.parse(customers);
