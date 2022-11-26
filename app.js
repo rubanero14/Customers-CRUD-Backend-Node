@@ -22,18 +22,12 @@ const getAllCustomers = (cb) => {
     fs.readFile(customerJSON, 'utf8', cb);
 };
 
-// GET: endpoint for get all customers list request
-app.get('/customers', async (req, res, next) => {
-   getAllCustomers((err, customers) => {
-        try {
-            res.status(200).send(JSON.parse(customers));
-        } catch {
-            res.status(503).send(err);
-        } 
-    })
-})
+// // HOME: Root Endpoint
+// app.get('/', async (req, res, next) => {
+//     res.send("Customers-CRUD-Backend-Node");
+// })
 
-// POST: endpoint for create new customer request
+// CREATE: endpoint for create new customer request
 app.post('/customers', async (req, res, next) => {
     const customer = req.body;
 
@@ -52,7 +46,18 @@ app.post('/customers', async (req, res, next) => {
     });
 })
 
-// GET: endpoint for customer details based on id request
+// READ: endpoint for get all customers list request
+app.get('/customers', async (req, res, next) => {
+    getAllCustomers((err, customers) => {
+         try {
+             res.status(200).send(JSON.parse(customers));
+         } catch {
+             res.status(503).send(err);
+         } 
+     })
+ })
+
+// READ: endpoint for customer details based on id request
 app.get('/customers/:id', async (req, res, next) => {
     const id = req.params.id;
     getAllCustomers((err, customers) => {
@@ -66,7 +71,7 @@ app.get('/customers/:id', async (req, res, next) => {
     });
 })
 
-// POST: endpoint for update customer details based on id
+// UPDATE: endpoint for update customer details based on id
 app.post('/customers/edit/:id', async (req, res, next) => {
     const customer = req.body;
     console.log(customer);
@@ -90,7 +95,7 @@ app.post('/customers/edit/:id', async (req, res, next) => {
     });
 })
 
-// POST: endpoint for delete request
+// DELETE: endpoint for delete request
 app.post('/deleteUser', async (req, res, next) => {
    const id = Object.keys(req.body)[0];
    console.log(id)
@@ -110,6 +115,12 @@ app.post('/deleteUser', async (req, res, next) => {
         }
     });
 })
+
+// Catch other undefined middlewares under Not Found category
+app.use((req, res, send) => {
+    // respond page not found 
+    res.status(404).send("404: Page not found");
+ })
 
 // Initiate Server
 app.listen(PORT, () => { console.log(`Server is online on PORT: http://localhost:${PORT}`)})
